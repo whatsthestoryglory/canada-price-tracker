@@ -8,6 +8,10 @@
 # Example code in package build process
 *-Ex.R
 
+# Saved files from scrapes
+*.png
+*.html
+
 # Output files from R CMD build
 /*.tar.gz
 
