@@ -20,3 +20,5 @@ Plan is to support the following
 - Cabelas.ca
 - MEC.ca
 - Sail.ca
+- Roots.ca
+- 
