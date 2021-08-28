@@ -21,4 +21,3 @@ Plan is to support the following
 - MEC.ca
 - Sail.ca
 - Roots.ca
-- 
