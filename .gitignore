@@ -12,6 +12,9 @@
 *.png
 *.html
 
+# Anything in .keys folder
+.keys/*
+
 # Output files from R CMD build
 /*.tar.gz
 
