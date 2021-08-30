@@ -20,7 +20,7 @@ source('dbsave.R')
 # No longer needed product_url <- "https://www.canadiantire.ca/en/pdp/napoleon-ld3-3-burner-propane-grill-0853158p.html#srp"
 
 scrape_url <- function(url) {
-  system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe ctscrape.js",url))
+  system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe canadiantire.ca.js",url))
   product_html <- read_html('ct.html')
   
   product_price <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "price__now--value", " " ))]') %>% html_text()
