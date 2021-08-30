@@ -14,16 +14,10 @@ package.check <- lapply(
   }
 )
 
+# Source the saving script for later use
+source('dbsave.R')
 
-test_doc <- paste("<html>",
-                  "<body>",
-                  "<span class='a1 b1'> text1 </span>",
-                  "<span class='price__now--value'> text2 </span>",
-                  "</body>",
-                  "</html>"
-)
-
-product_url <- "https://www.canadiantire.ca/en/pdp/vermont-castings-vanguard-4-burner-with-side-burner-convertible-gas-bbq-grill-0853156p.html"
+product_url <- "https://www.canadiantire.ca/en/pdp/napoleon-ld3-3-burner-propane-grill-0853158p.html#srp"
 
 system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe ctscrape.js",product_url))
 
@@ -41,3 +35,13 @@ if (length(product_price) == 0) {
 product_name <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "js-product-name", " " ))]') %>% html_text() %>% str_remove_all("\n")
 product_code <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "js-product-title-id", " " ))]') %>% html_text()
 product_code <- product_code[1]
+
+product <- tibble(
+ name = product_name,
+ price = product_price,
+ code = product_code,
+ request_url = product_url,
+ date_scraped = Sys.time()
+)
+
+save_scrape(product)
