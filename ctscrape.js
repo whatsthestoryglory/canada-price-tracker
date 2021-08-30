@@ -16,7 +16,7 @@ var path = 'ct.html'
 
 // create waitfor function so page fully loads before saving
 function waitFor(testFx, onReady, timeOutMillis) {
-    var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 3000, //< Default Max Timout is 3s
+    var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 10000, //< Default Max Timout is 3s
         start = new Date().getTime(),
         condition = false,
         interval = setInterval(function() {
@@ -39,29 +39,23 @@ function waitFor(testFx, onReady, timeOutMillis) {
 };
 
 page.settings.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0'
-page.onLoadFinished = function() {
-    console.log("page load finished");
-    page.render('ct.png');
-    fs.write(path, page.content, 'w');
-    phantom.exit();
-};
 page.open(url, function (status) {
 	if (status !== "success") {
 		console.log("unable to load page");
+		phantom.exit();
 	} else {
+	  console.log("page opened");
 		// wait for price to be visible
 		waitFor(function() {
             // Check in the page if a specific element is now visible
             return page.evaluate(function() {
-                return $(".add-to-cart__button").is(":visible");
+                return $(".mobile-delivery-options").is(":visible");
             });
         }, function() {
 			console.log("Price should be visible now")
 			page.render('ct.png');
 			fs.write(path, page.content, 'w');
 			phantom.exit();
-        });
+    });
 	}
-	//page.evaluate(function() {
-	//});
 });
