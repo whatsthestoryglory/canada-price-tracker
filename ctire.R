@@ -27,7 +27,7 @@ product_url <- "https://www.canadiantire.ca/en/pdp/vermont-castings-vanguard-4-b
 
 response <- GET(product_url, user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0"))
 
-system("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe ctscrape.js")
+system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe ctscrape.js",product_url))
 
 product_html <- read_html('ct.html')
 

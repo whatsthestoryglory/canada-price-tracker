@@ -1,4 +1,3 @@
-// scraper_PaddyPower.js
 
 // Create a webpage object
 var page = require('webpage').create();
@@ -6,8 +5,13 @@ var page = require('webpage').create();
 // Include the File System module for writing to files
 var fs = require('fs');
 
+// Capture arguments
+var args = require('system').args;
+var url = args[1]
+
+
 // Specify source and path to output file
-var url  = 'https://www.canadiantire.ca/en/pdp/weber-spirit-3-burner-propane-bbq-0853196p.html'
+//var url  = 'https://www.canadiantire.ca/en/pdp/weber-spirit-3-burner-propane-bbq-0853196p.html'
 var path = 'ct.html'
 
 // create waitfor function so page fully loads before saving
