@@ -31,11 +31,15 @@ system("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe ctscrape.js"
 
 product_html <- read_html('ct.html')
 
-product_price <- product_html %>% html_nodes(".price__now--value") %>% html_text()
+product_price <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "price__now--value", " " ))]') %>% html_text()
 
 if (length(product_price) == 0) {
-  product_price <- product_html %>% html_nodes(".price__reg-value_multisku") %>% html_text()
+  product_price <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "price__reg-value_multisku", " " ))]') %>% html_text()
   
 } else {
   product_price <- product_price[1]
 }
+
+product_name <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "js-product-name", " " ))]') %>% html_text() %>% str_remove_all("\n")
+product_code <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "js-product-title-id", " " ))]') %>% html_text()
+product_code <- product_code[1]
