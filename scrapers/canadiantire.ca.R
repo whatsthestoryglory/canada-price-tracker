@@ -3,7 +3,7 @@
 ################################################################################
 
 # Load required packages
-packagesNeeded <- c('tidyverse', 'rvest', "R.utils", 'httr')
+packagesNeeded <- c('tidyverse', 'rvest', "R.utils", 'httr', 'urltools')
 package.check <- lapply(
   packagesNeeded,
   FUN = function(x) {
@@ -95,4 +95,9 @@ scrape_canadian_tire <- function(product_url_list) {
   })  
 }
 
-scrape_canadian_tire(product_url_list)
+ctireurls <- price_collection$distinct("request_url") %>% 
+  urltools::url_parse() %>% 
+  filter(domain == "www.canadiantire.ca") %>% 
+  urltools::url_compose()
+
+scrape_canadian_tire(ctireurls)

@@ -3,7 +3,7 @@
 ################################################################################
 
 # Load required packages
-packagesNeeded <- c('tidyverse', 'rvest', "R.utils", 'httr')
+packagesNeeded <- c('tidyverse', 'rvest', "R.utils", 'httr', 'urltools')
 package.check <- lapply(
   packagesNeeded,
   FUN = function(x) {
@@ -60,4 +60,10 @@ scrape_sportchek <- function(product_url_list) {
     Sys.sleep(3)
   })  
 }
-scrape_sportchek(product_url_list)
+
+sportchekurls <- price_collection$distinct("request_url") %>% 
+  urltools::url_parse() %>% 
+  filter(domain == "www.sportchek.ca") %>% 
+  urltools::url_compose()
+
+scrape_sportchek(sportchekurls)
