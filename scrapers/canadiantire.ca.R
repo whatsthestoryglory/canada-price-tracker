@@ -40,8 +40,8 @@ scrape_url <- function(url) {
       str_extract_all(pattern="([0123456789.]+,*[0123456789.]*)") %>% 
       unlist() %>% 
       gsub(pattern=",", replacement="") %>%
-      min() %>% 
-      as.numeric()
+      as.numeric() %>%
+      min()
   }
   #if (length(product_price) == 0) {
   #  product_price <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "price__reg-value_multisku", " " ))]') %>% html_text()
