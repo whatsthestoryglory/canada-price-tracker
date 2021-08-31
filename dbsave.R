@@ -1,5 +1,5 @@
 ################################################################################
-# Script to save tibbles to mongodb
+# Script to save individual scrapes to mongodb
 ################################################################################
 
 # Load required packages
