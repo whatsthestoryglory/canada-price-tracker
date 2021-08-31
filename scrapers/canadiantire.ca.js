@@ -49,7 +49,7 @@ page.open(url, function (status) {
 		waitFor(function() {
             // Check in the page if a specific element is now visible
             return page.evaluate(function() {
-                return $(".mobile-delivery-options").is(":visible");
+                return $(".pdp-buy-box__primary-section").is(":visible");
             });
         }, function() {
 			console.log("Price should be visible now")
