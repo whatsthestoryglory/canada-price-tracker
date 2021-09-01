@@ -30,7 +30,11 @@ addProduct <- function (url) {
     domain = parsed_url$domain,
     last_requested = Sys.Date()
   )
-  product_collection$insert(product)
+  result <- product_collection$insert(product)
+  if (length(result$writeErrors) > 0) {
+    print("db write error")
+    print(result$writeErrors) 
+  }
 }
 
 addProducts <- function(urls) {
