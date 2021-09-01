@@ -36,5 +36,3 @@ addProduct <- function (url) {
 addProducts <- function(urls) {
   lapply(urls, addProduct)
 }
-
-addProduct("https://www.marks.com/en/timberland-mens-logan-bay-leather-chukka-boots-brown-color-brown-103256.html")
