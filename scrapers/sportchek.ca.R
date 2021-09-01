@@ -44,16 +44,6 @@ scrape_url <- function(url) {
   save_scrape(product) 
 }
 
-product_url_list <- c(
-  "https://www.sportchek.ca/categories/women/footwear/sneakers-lifestyle-boots/sneakers/product/converse-chuck-hi-shoes-black-white-unisex-331444675.html",
-  "https://www.sportchek.ca/categories/women/mothers-day-gift-guide/activewear/product/apple-airpods-with-charging-case-color-332944799_10-332944799.html",
-  "https://www.sportchek.ca/categories/women/footwear/running-shoes/neutral/product/asics-womens-gel-excite-8-running-shoes-color-333371880_01-333371880.html",
-  "https://www.sportchek.ca/categories/shop-by-sport/running/electronics/product/garmin-fenix-6s-pro-solar-fitness-watch-color-333333997_54-333333997.html",
-  "https://www.sportchek.ca/categories/electronics/headphones-speakers/headphones/earbuds-in-ear/true-wireless/product/jaybird-vista-2-true-wireless-sport-headphones-color-333364786_01-333364786.html",
-  "https://www.sportchek.ca/categories/shop-by-sport/running/running-apparel/mens/product/nike-mens-essential-running-jacket-333170392.html",
-  "https://www.sportchek.ca/categories/shop-by-sport/running/electronics/product/jbl-endurance-peak-ii-waterproof-true-wireless-sport-in-ear-head-color-333504056_01-333504056.html"
-)
-
 scrape_sportchek <- function(product_url_list) {
   lapply(product_url_list, function(x) {
     scrape_url(x)
