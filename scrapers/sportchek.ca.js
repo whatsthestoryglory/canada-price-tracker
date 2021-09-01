@@ -48,7 +48,7 @@ page.open(url, function (status) {
 		waitFor(function() {
             // Check in the page if a specific element is now visible
             return page.evaluate(function() {
-                return $(".product-detail__options").is(":visible");
+                return $(".product-detail__price-text").is(":visible");
             });
         }, function() {
 			console.log("Price should be visible now")
