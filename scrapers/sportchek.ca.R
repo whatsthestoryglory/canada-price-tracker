@@ -17,6 +17,8 @@ package.check <- lapply(
 # Source the saving script for later use
 source('dbsave.R')
 
+# Source the products script for later use
+source('products.R')
 
 scrape_url <- function(url) {
   system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe scrapers\\sportchek.ca.js",url))
@@ -51,9 +53,6 @@ scrape_sportchek <- function(product_url_list) {
   })  
 }
 
-sportchekurls <- price_collection$distinct("request_url") %>% 
-  urltools::url_parse() %>% 
-  filter(domain == "www.sportchek.ca") %>% 
-  urltools::url_compose()
+sportchekurls <- product_collection$find('{ "domain" : "www.sportchek.ca" }') %>% select(url)
 
-scrape_sportchek(sportchekurls)
+scrape_sportchek(sportchekurls[,1])
