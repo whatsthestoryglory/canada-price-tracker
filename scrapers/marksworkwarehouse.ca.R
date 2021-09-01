@@ -74,4 +74,4 @@ scrape_marks <- function(product_url_list) {
 
 mwwurls <- product_collection$find('{ "domain" : "www.marks.com" }') %>% select(url)
 
-scrape_marks(mwwurls)
+scrape_marks(mwwurls[,1])

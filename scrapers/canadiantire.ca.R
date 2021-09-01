@@ -75,4 +75,4 @@ scrape_canadian_tire <- function(product_url_list) {
 }
 
 ctireurls <- product_collection$find('{ "domain" : "www.canadiantire.ca" }') %>% select(url)
-scrape_canadian_tire(ctireurls)
+scrape_canadian_tire(ctireurls[,1])
