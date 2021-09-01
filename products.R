@@ -30,7 +30,15 @@ addProduct <- function (url) {
     domain = parsed_url$domain,
     last_requested = Sys.Date()
   )
-  result <- product_collection$insert(product)
+  if (length(product_collection$find(paste0('{"url" : "',cleaned_url,'"}'))) > 0) {
+    #product <- tibble( last_requested = Sys.Date() )
+    result <- product_collection$update(
+      sprintf('{"url":"%s"}', cleaned_url),
+      sprintf('{ "$set": {"last_requested":"%s"} }', product$last_requested)
+    )
+  } else {
+    result <- product_collection$insert(product) 
+  }
   if (length(result$writeErrors) > 0) {
     print("db write error")
     print(result$writeErrors) 
