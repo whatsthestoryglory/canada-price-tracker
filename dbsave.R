@@ -42,13 +42,13 @@ save_scrape <- function(scrape) {
   
   # Determine max price
   highest_product_price <- max(
-    db_result$highest_price,
+    as.numeric(db_result$highest_price),
     scrape$price
   )
   
   # Determine min price
   lowest_product_price <- min(
-    db_result$lowest_price,
+    as.numeric(db_result$lowest_price),
     scrape$price
   )
   
