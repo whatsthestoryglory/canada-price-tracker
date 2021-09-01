@@ -17,6 +17,8 @@ package.check <- lapply(
 # Source the saving script for later use
 source('dbsave.R')
 
+# Source the products script for later use
+source('products.R')
 
 scrape_url <- function(url) {
   system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe scrapers\\marksworkwarehouse.ca.js",url))
@@ -70,9 +72,6 @@ scrape_marks <- function(product_url_list) {
   })  
 }
 
-mwwurls <- price_collection$distinct("request_url") %>% 
-  urltools::url_parse() %>% 
-  filter(domain == "www.marks.com") %>% 
-  urltools::url_compose()
+mwwurls <- product_collection$find('{ "domain" : "www.marks.com" }') %>% select(url)
 
 scrape_marks(mwwurls)

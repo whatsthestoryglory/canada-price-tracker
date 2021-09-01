@@ -17,6 +17,9 @@ package.check <- lapply(
 # Source the saving script for later use
 source('dbsave.R')
 
+# Source the products script for later use
+source('products.R')
+
 # No longer needed product_url <- "https://www.canadiantire.ca/en/pdp/napoleon-ld3-3-burner-propane-grill-0853158p.html#srp"
 
 scrape_url <- function(url) {
@@ -71,9 +74,5 @@ scrape_canadian_tire <- function(product_url_list) {
   })  
 }
 
-ctireurls <- price_collection$distinct("request_url") %>% 
-  urltools::url_parse() %>% 
-  filter(domain == "www.canadiantire.ca") %>% 
-  urltools::url_compose()
-
+ctireurls <- product_collection$find('{ "domain" : "www.canadiantire.ca" }') %>% select(url)
 scrape_canadian_tire(ctireurls)
