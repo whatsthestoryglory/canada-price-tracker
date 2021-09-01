@@ -31,7 +31,9 @@ price_collection <- mongo(collection="prices", db="priceScrapeResults", url=conn
 #price_collection$insert(product)
 
 save_scrape <- function(product) {
-  
-  price_collection$insert(product)
-  
+  result <- price_collection$insert(product)
+  if (length(result$writeErrors) > 0) {
+    print("db write error")
+    print(result$writeErrors) 
+  }
 }
