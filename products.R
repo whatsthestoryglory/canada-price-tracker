@@ -25,8 +25,11 @@ addProduct <- function (url) {
   parsed_url$fragment <- NA
   parsed_url$parameter <- NA
   cleaned_url <- as.data.frame(urltools::url_compose(parsed_url))
-  names(cleaned_url) <- "url"
-  product_collection$insert(cleaned_url)
+  product <- tibble(
+    url = cleaned_url,
+    last_requested = Sys.Date()
+  )
+  product_collection$insert(product)
 }
 
 addProducts <- function(urls) {
