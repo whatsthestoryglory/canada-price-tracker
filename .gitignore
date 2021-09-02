@@ -11,6 +11,7 @@
 # Saved files from scrapes
 *.png
 *.html
+products/*
 
 # Anything in .keys folder
 .keys/*
