@@ -11,15 +11,18 @@ knitr::opts_chunk$set(echo = TRUE)
 source('products.R')
 # Source the saving script for later use
 source('dbsave.R')
-library("urltools", "ggplot2", "plotly")
+library(urltools)
+library(plotly)
+library(ggplot2)
 product <- product_collection$find(paste0('{"url" : "',params$url,'"}'))
+product_domain <- urltools::suffix_extract(product$domain)$domain
 
 page_title <- paste(
   params$sitename,
   "-",
   product$product_name,
   "from",
-  urltools::suffix_extract(product$domain)$domain
+  product_domain
 )
 ```
 
@@ -30,19 +33,38 @@ title: `r page_title`
 
 ## `r product$product_name`
 
-This product was last scraped on `r as.Date(product$last_scraped)` with a price of \$`r product$last_price`
+This product was last scraped on `r as.Date(product$last_scraped)` with a price of **\$`r product$last_price`**
 
 ### Price History
 
-```{r echo=FALSE}
+```{r include=FALSE}
 price_data <- price_collection$find(paste0('{"request_url" : "',params$url,'"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
 
 price_plot <- ggplot(
   price_data,
   aes(x = date_scraped, y = price)
 ) + geom_line()
-plotly::ggplotly(price_plot)
+# plotly::ggplotly(price_plot)
 ```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Price over time"}
+plotly_plot <- plot_ly(price_data, type="scatter", mode="lines") %>%
+  add_trace(x = ~date_scraped, y = ~price) %>%
+  layout(showlegend = F) %>%
+    layout(
+         xaxis = list(zerolinecolor = '#ffff',
+                      zerolinewidth = 2,
+                      gridcolor = 'ffff'),
+         yaxis = list(zerolinecolor = '#ffff',
+                      zerolinewidth = 2,
+                      gridcolor = 'ffff'),
+         plot_bgcolor='#e5ecf6')
+
+partial_bundle(plotly_plot, type = "auto", local = TRUE, minified = TRUE)
+
+```
+
+
 
 ```{r echo=FALSE, results='asis'}
 product_prices <- tibble(
@@ -53,3 +75,4 @@ product_prices <- tibble(
 library(knitr)
 kable(product_prices,
       caption = "Price Information")
+```
