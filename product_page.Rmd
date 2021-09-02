@@ -1,0 +1,55 @@
+---
+output: html_document
+params:
+    url: "https://www.sportchek.ca/categories/electronics/headphones-speakers/headphones/earbuds-in-ear/true-wireless/product/jaybird-vista-2-true-wireless-sport-headphones-color-333364786_01-333364786.html"
+    sitename: "PriceBeaver"
+---
+    
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Source the products script for later use
+source('products.R')
+# Source the saving script for later use
+source('dbsave.R')
+library("urltools", "ggplot2", "plotly")
+product <- product_collection$find(paste0('{"url" : "',params$url,'"}'))
+
+page_title <- paste(
+  params$sitename,
+  "-",
+  product$product_name,
+  "from",
+  urltools::suffix_extract(product$domain)$domain
+)
+```
+
+
+---
+title: `r page_title`
+---
+
+## `r product$product_name`
+
+This product was last scraped on `r as.Date(product$last_scraped)` with a price of \$`r product$last_price`
+
+### Price History
+
+```{r echo=FALSE}
+price_data <- price_collection$find(paste0('{"request_url" : "',params$url,'"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
+
+price_plot <- ggplot(
+  price_data,
+  aes(x = date_scraped, y = price)
+) + geom_line()
+plotly::ggplotly(price_plot)
+```
+
+```{r echo=FALSE, results='asis'}
+product_prices <- tibble(
+  "Highest Price" = product$highest_price,
+  "Lowest Price" = product$lowest_price,
+  "Typical Price" = product$typical_price
+)
+library(knitr)
+kable(product_prices,
+      caption = "Price Information")
