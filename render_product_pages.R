@@ -21,4 +21,5 @@ render_product_page <- function(url) {
   )
 }
 
-result <- lapply(product_urls, render_product_page())
+result <- lapply(product_urls, render_product_page)
+
