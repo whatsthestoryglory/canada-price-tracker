@@ -22,7 +22,7 @@ source('products.R')
 
 scrape_url <- function(url) {
   system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe scrapers\\marksworkwarehouse.ca.js",url))
-  product_html <- read_html('mww.html')
+  product_html <- read_html('mww.html', encoding = "UTF-8")
   
   product_price <- product_html %>% 
     html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "product-detail-price__current", " " ))]') %>% 

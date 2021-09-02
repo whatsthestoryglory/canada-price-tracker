@@ -24,7 +24,7 @@ source('products.R')
 
 scrape_url <- function(url) {
   system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe scrapers\\canadiantire.ca.js",url))
-  product_html <- read_html('ct.html')
+  product_html <- read_html('ct.html', encoding = "UTF-8")
   
   product_price <- product_html %>% 
     html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "price__now--value", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "price__total--on-sale", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "price__reg-value_multisku", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "price__reg-value", " " ))]') %>%
