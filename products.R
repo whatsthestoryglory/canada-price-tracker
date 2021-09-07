@@ -24,7 +24,12 @@ addProduct <- function (url) {
   parsed_url <- urltools::url_parse(url)
   parsed_url$fragment <- NA
   parsed_url$parameter <- NA
-  if (parsed_url$domain == "www.canadacomputers.com") { parsed_url$parameter <- urltools::url_parse(url)$parameter }
+  # Canada Computers uses php queries for its products.  Strip all but needed
+  if (parsed_url$domain == "www.canadacomputers.com") { 
+    parameters <- param_get(url, parameter_names = c("cPath","item_id"))
+    cleaned_url <- param_set(cleaned_url, key = "cPath", value = parameters$cPath)
+    cleaned_url <- param_set(cleaned_url, key = "item_id", value = parameters$item_id)
+  }
   cleaned_url <- urltools::url_compose(parsed_url)
   product <- tibble(
     url = cleaned_url,
