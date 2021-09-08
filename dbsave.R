@@ -42,7 +42,7 @@ save_scrape <- function(scrape) {
   
   # Determine max price
   highest_product_price <- max(
-    if(db_result$highest_price == "Inf") { 0 } else { as.numeric(db_result$highest_price) },
+    if(isTRUE(db_result$highest_price == "Inf")) { 0 } else { as.numeric(db_result$highest_price) },
     scrape$price
   )
   
