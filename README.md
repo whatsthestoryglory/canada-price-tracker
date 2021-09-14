@@ -15,7 +15,7 @@ Plan is to support the following
 - [ ] Well.ca
 - [ ] Newegg.ca
 - [ ] Homedepot.ca
-- [ ] Indigo.ca
+- [x] Indigo.ca
 - [ ] Staples.ca
 - [ ] Cabelas.ca
 - [ ] MEC.ca
