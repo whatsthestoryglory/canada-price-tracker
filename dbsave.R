@@ -43,13 +43,15 @@ save_scrape <- function(scrape) {
   # Determine max price
   highest_product_price <- max(
     if(isTRUE(db_result$highest_price == "Inf")) { 0 } else { as.numeric(db_result$highest_price) },
-    scrape$price
+    scrape$price,
+    na.rm=T
   )
   
   # Determine min price
   lowest_product_price <- min(
-    as.numeric(db_result$lowest_price),
-    scrape$price
+    if(isTRUE(db_result$lowest_price == "Inf")) { 0 } else { as.numeric(db_result$lowest_price) },
+    scrape$price,
+    na.rm=T
   )
   
   # Determine typical price
