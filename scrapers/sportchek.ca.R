@@ -36,6 +36,10 @@ scrape_url <- function(url) {
   product_code <- product_html %>% html_nodes(xpath='//*[(@id = "product-detail__description-style-num")]') %>% html_text()
   product_code <- product_code[1]
   
+  if (product_price == "Inf") { 
+    print("Error reading price.  Not adding to db") 
+    print(url)
+  } else {
   product <- tibble(
     name = product_name,
     price = product_price,
@@ -43,7 +47,9 @@ scrape_url <- function(url) {
     request_url = url,
     date_scraped = Sys.time()
   )
+  print(product)
   save_scrape(product) 
+  }
 }
 
 scrape_sportchek <- function(product_url_list) {

@@ -56,7 +56,10 @@ scrape_url <- function(url) {
   product_name <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "js-product-name", " " ))]') %>% html_text() %>% str_remove_all("\n")
   product_code <- product_html %>% html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "js-product-title-id", " " ))]') %>% html_text()
   product_code <- product_code[1]
-  
+  if (product_price == "Inf") { 
+    print("Error reading price.  Not adding to db") 
+    print(url)
+  } else {
   product <- tibble(
     name = product_name,
     price = product_price,
@@ -64,7 +67,9 @@ scrape_url <- function(url) {
     request_url = url,
     date_scraped = Sys.time()
   )
+  print(product)
   save_scrape(product) 
+  }
 }
 
 scrape_canadian_tire <- function(product_url_list) {

@@ -61,7 +61,10 @@ scrape_url <- function(url) {
     gsub(pattern="\\n",replacement="") %>%
     gsub(pattern="Item Code:  ", replacement="")
   }
-  
+  if (product_price == "Inf") { 
+    print("Error reading price.  Not adding to db") 
+    print(url)
+  } else {
   product <- tibble(
     name = product_name,
     price = product_price,
@@ -69,8 +72,9 @@ scrape_url <- function(url) {
     request_url = url,
     date_scraped = Sys.time()
   )
-  product
+  print(product)
   save_scrape(product) 
+  }
 }
 
 scrape_indigo <- function(product_url_list) {

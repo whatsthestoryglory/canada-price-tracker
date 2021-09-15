@@ -22,6 +22,7 @@ source('products.R')
 
 scrape_url <- function(url) {
   # system(paste("C:\\Users\\Cam\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe scrapers\\marksworkwarehouse.ca.js",url))
+  # print(paste("Scraping url:", url))
   product_html <- read_html(url, encoding = "UTF-8")
   
   product_price <- product_html %>% 
@@ -55,16 +56,20 @@ scrape_url <- function(url) {
     gsub(pattern="Item Code:  ", replacement="")
   
   # product_code <- product_code[1]
-  
-  product <- tibble(
-    name = product_name,
-    price = product_price,
-    code = product_code,
-    request_url = url,
-    date_scraped = Sys.time()
-  )
-  product
-  save_scrape(product) 
+  if (product_price == "Inf") { 
+    print("Error reading price.  Not adding to db") 
+    print(url)
+  } else {
+    product <- tibble(
+      name = product_name,
+      price = product_price,
+      code = product_code,
+      request_url = url,
+      date_scraped = Sys.time()
+    )
+    print(product)
+    save_scrape(product) 
+  }
 }
 
 scrape_cc <- function(product_url_list) {
