@@ -129,8 +129,6 @@ plotPriceHistory <- function(price_data, domain) {
             } 
         }]'))
     plotme <- tibble("X" = c(1,2,3,4,5), "Y" = c(5,4,3,2,1))
-    plotly_plot <- plot_ly(plotme, type="scatter", mode="lines") %>%
-        add_trace(x=~X, y=~Y)
     plotly_plot <- plot_ly(
         scrape_data, 
         x = ~`_id`,
