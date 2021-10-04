@@ -108,6 +108,26 @@ getProductList <- function(domain) {
 
 plotPriceHistory <- function(price_data) {
     # print(paste("plotPriceHistory", price_data, length(price_data)))
+    
+    # Default plot to be shown when no row selected
+    scrape_data <- shiny_price_collection$aggregate(paste0(
+        '[{ 
+            "$match": {
+                "request_url" : { "$regex": "',domain,'", "$options" : "i" }
+                }
+        },
+        {
+            "$group":{ 
+                "_id": { 
+                    "$dateToString": { 
+                        "date": "$date_scraped",
+                        "format" : "%Y-%m-%d" 
+                    } 
+                },
+                "count": { "$sum":1 },
+                "uniqueValues": { "$addToSet": "$request_url"}
+            } 
+        }]'))
     plotme <- tibble("X" = c(1,2,3,4,5), "Y" = c(5,4,3,2,1))
     plotly_plot <- plot_ly(plotme, type="scatter", mode="lines") %>%
         add_trace(x=~X, y=~Y)
