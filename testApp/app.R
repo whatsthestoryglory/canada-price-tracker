@@ -20,24 +20,74 @@ domain_list <- tibble("Domains" = shiny_product_collection$distinct("domain"))
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
-    theme = bs_theme(version = 4, bootswatch = "minty"),
+    theme = bs_theme(version = 4, bootswatch = "darkly"),
     # Application title
     titlePanel("Price Beaver Test App"),
 
+    fluidRow(
+        
+        # Sidebar
+        column(4,
+               wellPanel(
+                   selectInput("domain",
+                               "Website:",
+                               domain_list)
+               )
+              ),
+        
+        # Main area
+        column(8,
+               textOutput('selectedProducts'),
+               dataTableOutput('productTable')
+              )
+    )
+    
+    
+    
+    
     # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            selectInput("domain",
-                        "Website:",
-                        domain_list)
-        ),
+    # sidebarLayout(
+    #    sidebarPanel(
+    #        selectInput("domain",
+    #                    "Website:",
+    #                    domain_list)
+    #    ),
 
         # Show a plot of the generated distribution
-        mainPanel(
-           dataTableOutput('productTable')
-        )
-    )
+    #    mainPanel(
+    #       dataTableOutput('productTable')
+    #    )
+    # )
 )
+
+productList <- shiny_product_collection$find(
+    query = paste0('{ "domain" : "www.canadiantire.ca" }'),
+    fields = '{ 
+            "product_name" : true, 
+            "last_price" : true, 
+            "typical_price" : true, 
+            "highest_price": true, 
+            "lowest_price": true, 
+            "last_scraped" : true,
+            "url" : true,
+            "_id" : false }'
+)
+
+# Get list of products for selected domain
+oldDomain <- ""
+
+getDomainProducts <- function(domain) {
+    if (oldDomain == "") { oldDomain <- domain }
+    else if (oldDomain == domain) { 
+        # if domain hasn't updated, return the same thing as last time
+        return()
+    }
+    # if oldDomain isn't domain, then pull from mongodb
+    
+    
+    
+}
+
 
 
 # Define how the data table is returned
@@ -52,23 +102,45 @@ getProductList <- function(domain) {
             "highest_price": true, 
             "lowest_price": true, 
             "last_scraped" : true,
+            "url" : true,
             "_id" : false }'
     )
     sortedList <- tibble(
         "Product Name" = productList$product_name,
         "Most Recent Price" = productList$last_price,
         "Typical Price" = (productList$typical_price),
-        "Discount" = (as.numeric(productList$typical_price) - as.numeric(productList$last_price)) / as.numeric(productList$typical_price)
+        "Discount" = (as.numeric(productList$typical_price) - as.numeric(productList$last_price)) / as.numeric(productList$typical_price),
+        "URL" = productList$url
     )
-    return(sortedList)
+    return(sortedList %>% filter(Discount > 0))
 }
 
+
+getPriceHistory <- function(selected) {
+    price_data <- price_collection$find(paste0('{"request_url" : "',params$url,'"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
+    plotly_plot <- plot_ly(price_data, type="scatter", mode="lines") %>%
+        add_trace(x = ~date_scraped, y = ~price) %>%
+        layout(showlegend = F) %>%
+        layout(
+            xaxis = list(zerolinecolor = '#ffff',
+                         zerolinewidth = 2,
+                         gridcolor = 'ffff'),
+            yaxis = list(zerolinecolor = '#ffff',
+                         zerolinewidth = 2,
+                         gridcolor = 'ffff'),
+            plot_bgcolor='#e5ecf6')
+    return(partial_bundle(plotly_plot, type = "auto", local = TRUE, minified = TRUE))
+}
 
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-    output$productTable <- DT::renderDataTable(
-        datatable(getProductList(input$domain))
+    output$productTable <- DT::renderDT(
+        datatable(
+            getProductList(input$domain), 
+            selection = 'single', # Enables selecting single rows only
+            rownames= FALSE, # Hides the row numbers column
+            options = list(columnDefs = list(list(visible=FALSE, targets=4)))) # Hides the URL column
     %>%
         formatCurrency(
             c("Most Recent Price", "Typical Price"),
@@ -87,6 +159,14 @@ server <- function(input, output) {
             dec.mark = getOption("OutDec")
         )
     )
+    
+
+
+    output$selectedProducts <- renderPrint({
+        sortedList <- getProductList(input$domain)
+        sortedList$`Product Name`[input$productTable_rows_selected]
+    })
+    #output$selectedProducts <- getPriceHistory(input$productTable_rows_selected)
 }
 
 # Run the application 
