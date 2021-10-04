@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(bslib)
 library(mongolite)
 library(data.table)
 library(DT)
@@ -19,6 +20,7 @@ domain_list <- tibble("Domains" = shiny_product_collection$distinct("domain"))
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
+    theme = bs_theme(version = 4, bootswatch = "minty"),
     # Application title
     titlePanel("Price Beaver Test App"),
 
