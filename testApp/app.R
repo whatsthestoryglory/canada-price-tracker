@@ -131,6 +131,22 @@ plotPriceHistory <- function(price_data, domain) {
     plotme <- tibble("X" = c(1,2,3,4,5), "Y" = c(5,4,3,2,1))
     plotly_plot <- plot_ly(plotme, type="scatter", mode="lines") %>%
         add_trace(x=~X, y=~Y)
+    plotly_plot <- plot_ly(
+        scrape_data, 
+        x = ~`_id`,
+        y = ~count,
+        type="bar") %>%
+        layout(
+            title=paste("Prices scraped from", domain),
+            xaxis = list(
+                title="Date",
+                type = "date",
+                tickformat = "%B %Y"),
+            yaxis = list(title="Quantity")
+        )
+    plotly_plot <- config(plotly_plot, displayModeBar = FALSE)
+    
+    # Change default plot if necessary
     if (length(price_data)) {
         prices_to_render <- tibble(price_data) %>%
             mutate(date_col = date(date_scraped)) %>%
