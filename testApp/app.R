@@ -213,7 +213,7 @@ server <- function(input, output) {
         # print(sortedList)
         urlToFind <- sortedList$`URL`[input$productTable_rows_selected]
         prices <- shiny_price_collection$find(paste0('{"request_url" : "', urlToFind, '"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
-        toPlot <- plotPriceHistory(prices)
+        toPlot <- plotPriceHistory(prices, input$domain)
         # print(length(toPlot))
         toPlot
     })
