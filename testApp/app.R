@@ -13,10 +13,14 @@ library(mongolite)
 library(data.table)
 library(DT)
 library(tidyverse)
+library(plotly)
 # readRenviron(".Renviron")
 mongo_string <- (Sys.getenv("MONGO_STRING"))
 shiny_product_collection <- mongo(collection="products", db="priceScrapeResults", url=mongo_string)
+shiny_price_collection <- mongo(collection="prices", db="priceScrapeResults", url=mongo_string)
 domain_list <- tibble("Domains" = shiny_product_collection$distinct("domain"))
+
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
@@ -37,7 +41,8 @@ ui <- fluidPage(
         
         # Main area
         column(8,
-               textOutput('selectedProducts'),
+               plotlyOutput('selectedProducts'),
+               textOutput('selectedProductText'),
                dataTableOutput('productTable')
               )
     )
@@ -116,8 +121,7 @@ getProductList <- function(domain) {
 }
 
 
-getPriceHistory <- function(selected) {
-    price_data <- price_collection$find(paste0('{"request_url" : "',params$url,'"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
+plotPriceHistory <- function(price_data) {
     plotly_plot <- plot_ly(price_data, type="scatter", mode="lines") %>%
         add_trace(x = ~date_scraped, y = ~price) %>%
         layout(showlegend = F) %>%
@@ -143,8 +147,8 @@ server <- function(input, output) {
             options = list(columnDefs = list(list(visible=FALSE, targets=4)))) # Hides the URL column
     %>%
         formatCurrency(
-            c("Most Recent Price", "Typical Price"),
-            currency = "$",
+            c("Most Recent Price", "Typical Price"), # Formats the price columns as currency
+            currency = "$", 
             interval = 3,
             mark = ",",
             digits = 2,
@@ -152,7 +156,7 @@ server <- function(input, output) {
             before = TRUE
         ) %>%
         formatPercentage(
-            c("Discount"),
+            c("Discount"), # Formats the 'Discount' column as a percentage
             digits = 2,
             interval = 3,
             mark = ",",
@@ -160,11 +164,18 @@ server <- function(input, output) {
         )
     )
     
-
-
-    output$selectedProducts <- renderPrint({
+    output$selectedProductText <- renderText({
         sortedList <- getProductList(input$domain)
-        sortedList$`Product Name`[input$productTable_rows_selected]
+        urlToFind <- sortedList$`URL`[input$productTable_rows_selected]
+        prices <- shiny_price_collection$find(paste0('{"request_url" : "', urlToFind, '"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
+        colnames(prices)
+    })
+
+    output$selectedProducts <- renderPlotly({
+        sortedList <- getProductList(input$domain)
+        urlToFind <- sortedList$`URL`[input$productTable_rows_selected]
+        prices <- shiny_price_collection$find(paste0('{"request_url" : "', urlToFind, '"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
+        plotPriceHistory(prices)
     })
     #output$selectedProducts <- getPriceHistory(input$productTable_rows_selected)
 }
