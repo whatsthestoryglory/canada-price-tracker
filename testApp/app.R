@@ -150,7 +150,8 @@ plotPriceHistory <- function(price_data, domain) {
             mutate(date_col = date(date_scraped)) %>%
             group_by(date_col) %>%
             summarize(value = mean(price))
-        plotly_plot <- plot_ly(prices_to_render, type="scatter", mode="lines") %>%
+        plotly_plot <- plot_ly(prices_to_render, type="scatter", mode="lines") 
+        plotly_plot <- config(plotly_plot, displayModeBar = FALSE)%>%
             add_trace(
                 x = ~date_col, 
                 y = ~value,
@@ -158,14 +159,19 @@ plotPriceHistory <- function(price_data, domain) {
                 ) %>%
             layout(showlegend = F) %>%
             layout(
+                title = list(
+                    text = "Price history",
+                    xanchor = 'left'),
                 xaxis = list(zerolinecolor = '#ffff',
                              zerolinewidth = 2,
-                             gridcolor = 'ffff'),
+                             gridcolor = 'ffff',
+                             title="Date"),
                 yaxis = list(zerolinecolor = '#ffff',
                              zerolinewidth = 2,
                              gridcolor = 'ffff',
                              hoverformat = '$,.2f',
-                             tickformat = '$'),
+                             tickformat = '$',
+                             title="Price"),
                 plot_bgcolor='#e5ecf6')
         }
     return(partial_bundle(plotly_plot, type = "auto", local = TRUE, minified = TRUE))
