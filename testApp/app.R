@@ -20,7 +20,7 @@ mongo_string <- (Sys.getenv("MONGO_STRING"))
 shiny_product_collection <- mongo(collection="products", db="priceScrapeResults", url=mongo_string)
 shiny_price_collection <- mongo(collection="prices", db="priceScrapeResults", url=mongo_string)
 domain_list <- tibble("Domains" = shiny_product_collection$distinct("domain"))
-
+domain_list <- tibble("Domains" = prepend(domain_list$Domains, ""))
 
 # Define UI for application
 ui <- fluidPage(
@@ -106,28 +106,33 @@ getProductList <- function(domain) {
 
 
 plotPriceHistory <- function(price_data) {
+    # print(paste("plotPriceHistory", price_data, length(price_data)))
     plotme <- tibble("X" = c(1,2,3,4,5), "Y" = c(5,4,3,2,1))
     plotly_plot <- plot_ly(plotme, type="scatter", mode="lines") %>%
         add_trace(x=~X, y=~Y)
     if (length(price_data)) {
-    prices_to_render <- tibble(price_data) %>%
-        mutate(date_col = date(date_scraped)) %>%
-        group_by(date_col) %>%
-        summarize(value = mean(price))
-    plotly_plot <- plot_ly(prices_to_render, type="scatter", mode="lines") %>%
-        add_trace(x = ~date_col, y = ~value) %>%
-        layout(showlegend = F) %>%
-        layout(
-            xaxis = list(zerolinecolor = '#ffff',
-                         zerolinewidth = 2,
-                         gridcolor = 'ffff'),
-            yaxis = list(zerolinecolor = '#ffff',
-                         zerolinewidth = 2,
-                         gridcolor = 'ffff'),
-            plot_bgcolor='#e5ecf6')
-    }
-
-
+        print("length(price_data)")
+        prices_to_render <- tibble(price_data) %>%
+            mutate(date_col = date(date_scraped)) %>%
+            group_by(date_col) %>%
+            summarize(value = mean(price))
+        plotly_plot <- plot_ly(prices_to_render, type="scatter", mode="lines") %>%
+            add_trace(
+                x = ~date_col, 
+                y = ~value,
+                hovertemplate = "<b>Price:</b> %{y} <br><b>Date:</b> %{x} <extra></extra>"
+                ) %>%
+            layout(showlegend = F) %>%
+            layout(
+                xaxis = list(zerolinecolor = '#ffff',
+                             zerolinewidth = 2,
+                             gridcolor = 'ffff'),
+                yaxis = list(zerolinecolor = '#ffff',
+                             zerolinewidth = 2,
+                             gridcolor = 'ffff',
+                             hoverformat = '$,.2f'),
+                plot_bgcolor='#e5ecf6')
+        }
     return(partial_bundle(plotly_plot, type = "auto", local = TRUE, minified = TRUE))
 }
 
@@ -166,9 +171,12 @@ server <- function(input, output) {
 
     output$selectedProducts <- renderPlotly({
         sortedList <- getProductList(input$domain)
+        # print(sortedList)
         urlToFind <- sortedList$`URL`[input$productTable_rows_selected]
         prices <- shiny_price_collection$find(paste0('{"request_url" : "', urlToFind, '"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
-        plotPriceHistory(prices)
+        toPlot <- plotPriceHistory(prices)
+        # print(length(toPlot))
+        toPlot
     })
     #output$selectedProducts <- getPriceHistory(input$productTable_rows_selected)
 }
