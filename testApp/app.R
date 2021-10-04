@@ -106,7 +106,7 @@ getProductList <- function(domain) {
 }
 
 
-plotPriceHistory <- function(price_data) {
+plotPriceHistory <- function(price_data, domain) {
     # print(paste("plotPriceHistory", price_data, length(price_data)))
     
     # Default plot to be shown when no row selected
