@@ -102,7 +102,7 @@ getProductList <- function(domain) {
         "Discount" = (as.numeric(productList$typical_price) - as.numeric(productList$last_price)) / as.numeric(productList$typical_price),
         "URL" = productList$url
     )
-    return(sortedList %>% filter(Discount > 0))
+    return(sortedList)
 }
 
 
