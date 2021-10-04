@@ -175,33 +175,37 @@ plotPriceHistory <- function(price_data, domain) {
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     output$productTable <- DT::renderDT(
-        datatable(
-            getProductList(input$domain), 
-            selection = 'single', # Enables selecting single rows only
-            rownames= FALSE, # Hides the row numbers column
-            options = list(
-                columnDefs = list(list(visible=FALSE, targets=4)), # Hides the URL column
-                scrollY = "200px",
-                scrollCollapse = TRUE,
-                paging = FALSE)) 
-    %>%
-        formatCurrency(
-            c("Most Recent Price", "Typical Price"), # Formats the price columns as currency
-            currency = "$", 
-            interval = 3,
-            mark = ",",
-            digits = 2,
-            dec.mark = getOption("OutDec"),
-            before = TRUE
-        ) %>%
-        formatPercentage(
-            c("Discount"), # Formats the 'Discount' column as a percentage
-            digits = 2,
-            interval = 3,
-            mark = ",",
-            dec.mark = getOption("OutDec")
-        )
-    )
+        if (input$domain != "") { 
+            print(length(input$domain))
+            datatable(
+                getProductList(input$domain), 
+                selection = 'single', # Enables selecting single rows only
+                rownames= FALSE, # Hides the row numbers column
+                options = list(
+                    columnDefs = list(list(visible=FALSE, targets=4)), # Hides the URL column
+                    scrollY = "200px",
+                    scrollCollapse = TRUE,
+                    paging = FALSE,
+                    order = list(3,'desc'))) %>%
+            formatCurrency(
+                c("Most Recent Price", "Typical Price"), # Formats the price columns as currency
+                currency = "$", 
+                interval = 3,
+                mark = ",",
+                digits = 2,
+                dec.mark = getOption("OutDec"),
+                before = TRUE
+            ) %>%
+            formatPercentage(
+                c("Discount"), # Formats the 'Discount' column as a percentage
+                digits = 2,
+                interval = 3,
+                mark = ",",
+                dec.mark = getOption("OutDec")
+            )
+        } else { data.table(variable1 = integer(),
+                           variable2 = character(),
+                           variable3 = numeric()) } )
 
 
     output$selectedProducts <- renderPlotly({
