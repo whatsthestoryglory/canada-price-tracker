@@ -22,7 +22,7 @@ shiny_price_collection <- mongo(collection="prices", db="priceScrapeResults", ur
 domain_list <- tibble("Domains" = shiny_product_collection$distinct("domain"))
 
 
-# Define UI for application that draws a histogram
+# Define UI for application
 ui <- fluidPage(
 
     theme = bs_theme(version = 4, bootswatch = "darkly"),
@@ -43,7 +43,6 @@ ui <- fluidPage(
         # Main area
         column(8,
                plotlyOutput('selectedProducts'),
-               textOutput('selectedProductText'),
                dataTableOutput('productTable')
               )
     )
@@ -79,22 +78,6 @@ productList <- shiny_product_collection$find(
             "_id" : false }'
 )
 
-# Get list of products for selected domain
-oldDomain <- ""
-
-getDomainProducts <- function(domain) {
-    if (oldDomain == "") { oldDomain <- domain }
-    else if (oldDomain == domain) { 
-        # if domain hasn't updated, return the same thing as last time
-        return()
-    }
-    # if oldDomain isn't domain, then pull from mongodb
-    
-    
-    
-}
-
-
 
 # Define how the data table is returned
 
@@ -123,6 +106,10 @@ getProductList <- function(domain) {
 
 
 plotPriceHistory <- function(price_data) {
+    plotme <- tibble("X" = c(1,2,3,4,5), "Y" = c(5,4,3,2,1))
+    plotly_plot <- plot_ly(plotme, type="scatter", mode="lines") %>%
+        add_trace(x=~X, y=~Y)
+    if (length(price_data)) {
     prices_to_render <- tibble(price_data) %>%
         mutate(date_col = date(date_scraped)) %>%
         group_by(date_col) %>%
@@ -138,6 +125,9 @@ plotPriceHistory <- function(price_data) {
                          zerolinewidth = 2,
                          gridcolor = 'ffff'),
             plot_bgcolor='#e5ecf6')
+    }
+
+
     return(partial_bundle(plotly_plot, type = "auto", local = TRUE, minified = TRUE))
 }
 
@@ -149,7 +139,11 @@ server <- function(input, output) {
             getProductList(input$domain), 
             selection = 'single', # Enables selecting single rows only
             rownames= FALSE, # Hides the row numbers column
-            options = list(columnDefs = list(list(visible=FALSE, targets=4)))) # Hides the URL column
+            options = list(
+                columnDefs = list(list(visible=FALSE, targets=4)), # Hides the URL column
+                scrollY = "200px",
+                scrollCollapse = TRUE,
+                paging = FALSE)) 
     %>%
         formatCurrency(
             c("Most Recent Price", "Typical Price"), # Formats the price columns as currency
@@ -168,13 +162,7 @@ server <- function(input, output) {
             dec.mark = getOption("OutDec")
         )
     )
-    
-    output$selectedProductText <- renderText({
-        sortedList <- getProductList(input$domain)
-        urlToFind <- sortedList$`URL`[input$productTable_rows_selected]
-        prices <- shiny_price_collection$find(paste0('{"request_url" : "', urlToFind, '"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
-        colnames(prices)
-    })
+
 
     output$selectedProducts <- renderPlotly({
         sortedList <- getProductList(input$domain)
