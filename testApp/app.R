@@ -15,6 +15,7 @@ library(DT)
 library(tidyverse)
 library(plotly)
 library(lubridate)
+thematic::thematic_shiny()
 # readRenviron(".Renviron")
 mongo_string <- (Sys.getenv("MONGO_STRING"))
 shiny_product_collection <- mongo(collection="products", db="priceScrapeResults", url=mongo_string)
@@ -111,7 +112,6 @@ plotPriceHistory <- function(price_data) {
     plotly_plot <- plot_ly(plotme, type="scatter", mode="lines") %>%
         add_trace(x=~X, y=~Y)
     if (length(price_data)) {
-        print("length(price_data)")
         prices_to_render <- tibble(price_data) %>%
             mutate(date_col = date(date_scraped)) %>%
             group_by(date_col) %>%
@@ -130,7 +130,8 @@ plotPriceHistory <- function(price_data) {
                 yaxis = list(zerolinecolor = '#ffff',
                              zerolinewidth = 2,
                              gridcolor = 'ffff',
-                             hoverformat = '$,.2f'),
+                             hoverformat = '$,.2f',
+                             tickformat = '$'),
                 plot_bgcolor='#e5ecf6')
         }
     return(partial_bundle(plotly_plot, type = "auto", local = TRUE, minified = TRUE))
