@@ -39,6 +39,7 @@ scrape_url <- function(url) {
     product_price <- parse_number(as.character(product_price))
   } else {
     product_price <- product_price %>% 
+      as.character() %>%
       str_c(collapse="") %>% 
       str_extract_all(pattern="([0123456789.]+,*[0123456789.]*)") %>% 
       unlist() %>% 
