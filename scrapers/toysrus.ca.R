@@ -21,6 +21,7 @@ source('dbsave.R')
 source('products.R')
 
 scrape_url <- function(url) {
+  print(paste("Reading from", url))
   product_html <- read_html(url, encoding = "UTF-8")
   
   product_price <- product_html %>% 
@@ -72,7 +73,16 @@ scrape_url <- function(url) {
 
 scrape_toysrus <- function(product_url_list) {
   lapply(product_url_list, function(x) {
-    scrape_url(x)
+    tryCatch( {
+      scrape_url(x)
+    },
+    error=function(cond) {
+      message(paste("URL Error on", x))
+      message("Error message:")
+      message(cond)
+      return(NA)
+    }
+    )
     Sys.sleep(3)
   })  
 }
