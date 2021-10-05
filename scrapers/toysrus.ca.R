@@ -21,7 +21,7 @@ source('dbsave.R')
 source('products.R')
 
 scrape_url <- function(url) {
-  print(paste("Reading from", url))
+  # print(paste("Reading from", url))
   product_html <- read_html(url, encoding = "UTF-8")
   
   product_price <- product_html %>% 
