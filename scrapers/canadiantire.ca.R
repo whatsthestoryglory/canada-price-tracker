@@ -74,7 +74,16 @@ scrape_url <- function(url) {
 
 scrape_canadian_tire <- function(product_url_list) {
   lapply(product_url_list, function(x) {
-    scrape_url(x)
+    tryCatch( {
+      scrape_url(x)
+    },
+    error=function(cond) {
+      message(paste("URL Error on", x))
+      message("Error message:")
+      message(cond)
+      return(NA)
+    }
+    )
     Sys.sleep(3)
   })  
 }
