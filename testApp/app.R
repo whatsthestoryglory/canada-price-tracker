@@ -113,10 +113,10 @@ plotPriceHistory <- function(price_data, domain) {
     scrape_data <- shiny_price_collection$aggregate(paste0(
         '[{ 
             "$match": {
-                "request_url" : { "$regex": "',domain,'", "$options" : "i" }
-                }
-        },
-        {
+                        "request_url" : { "$regex": "',domain,'", "$options" : "i" }
+                       }
+         },
+         {
             "$group":{ 
                 "_id": { 
                     "$dateToString": { 
@@ -128,11 +128,12 @@ plotPriceHistory <- function(price_data, domain) {
                 "uniqueValues": { "$addToSet": "$request_url"}
             } 
         }]'))
+    scrape_data$uniqueCount <- lengths(scrape_data$uniqueValues)
     plotme <- tibble("X" = c(1,2,3,4,5), "Y" = c(5,4,3,2,1))
     plotly_plot <- plot_ly(
         scrape_data, 
         x = ~`_id`,
-        y = ~count,
+        y = ~uniqueCount,
         type="bar") %>%
         layout(
             title=paste("Prices scraped from", domain),
