@@ -8,6 +8,7 @@ Plan is to support the following
 - [x] Canadian Tire
 - [x] Sportchek
 - [x] Mark's Work Warehouse
+- [x] Toys R Us.ca
 - [ ] Hudson's Bay
 - [x] Canada Computers
 - [ ] Walmart.ca
