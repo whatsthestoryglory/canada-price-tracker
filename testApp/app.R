@@ -23,6 +23,20 @@ shiny_price_collection <- mongo(collection="prices", db="priceScrapeResults", ur
 domain_list <- tibble("Domains" = shiny_product_collection$distinct("domain"))
 domain_list <- tibble("Domains" = prepend(domain_list$Domains, ""))
 
+
+
+
+getBrandColor <- function(domain) {
+    case_when(
+        domain == "www.canadiantire.ca" ~ "#ED2626",
+        domain == "www.sportchek.ca" ~    "#EF3629",
+        domain == "www.toysrus.ca" ~      "#0060AE",
+        domain == "www.marks.com" ~       "#F78E1E",
+        domain == "www.chapters.indigo.ca" ~ "#ABABB9",
+        domain == "www.canadacomputers.com" ~"#FFDD00",
+        TRUE ~                               "#FFFFFF"
+    )
+}
 # Define UI for application
 ui <- fluidPage(
 
@@ -129,19 +143,34 @@ plotPriceHistory <- function(price_data, domain) {
             } 
         }]'))
     scrape_data$uniqueCount <- lengths(scrape_data$uniqueValues)
+    scrape_data <- scrape_data[order(as.Date(scrape_data$`_id`, format="%Y-%m-%d")),]
     plotme <- tibble("X" = c(1,2,3,4,5), "Y" = c(5,4,3,2,1))
     plotly_plot <- plot_ly(
         scrape_data, 
         x = ~`_id`,
         y = ~uniqueCount,
-        type="bar") %>%
+        type="scatter",
+        mode="lines",
+        line = list(color =getBrandColor(domain)),
+        hovertemplate = "<b>Count:</b> %{y} <br><b>Date:</b> %{x} <extra></extra>") %>%
         layout(
-            title=paste("Prices scraped from", domain),
+            title= list(
+                text=paste("Prices scraped from", domain),
+                font=list(
+                    size = 20,
+                    color = "#FFFFFF"
+                )
+            ),
+            paper_bgcolor="#222222",
+            plot_bgcolor="#222222",
+            margin=5,
             xaxis = list(
                 title="Date",
                 type = "date",
-                tickformat = "%B %Y"),
-            yaxis = list(title="Quantity")
+                tickformat = "%d %B %Y",
+                color = "#FFFFFF",
+                gridcolor = "#434343"),
+            yaxis = list(title="Quantity", color = "#FFFFFF")
         )
     plotly_plot <- config(plotly_plot, displayModeBar = FALSE)
     
@@ -156,22 +185,32 @@ plotPriceHistory <- function(price_data, domain) {
             add_trace(
                 x = ~date_col, 
                 y = ~value,
-                hovertemplate = "<b>Price:</b> %{y} <br><b>Date:</b> %{x} <extra></extra>"
+                hovertemplate = "<b>Price:</b> %{y} <br><b>Date:</b> %{x} <extra></extra>",
+                line = list(color =getBrandColor(domain))
                 ) %>%
             layout(showlegend = F) %>%
             layout(
+                paper_bgcolor="#222222",
+                plot_bgcolor="#222222",
                 title = list(
                     text = "Price history",
-                    xanchor = 'left'),
-                xaxis = list(zerolinecolor = '#ffff',
+                    xanchor = 'left',
+                    font = list(
+                        size = 20,
+                        color = "#FFFFFF"
+                    )),
+                margin=5,
+                xaxis = list(zerolinecolor = '#eeeeee',
                              zerolinewidth = 2,
-                             gridcolor = 'ffff',
-                             title="Date"),
-                yaxis = list(zerolinecolor = '#ffff',
+                             gridcolor = '#434343',
+                             title="Date",
+                             color = "#FFFFFF"),
+                yaxis = list(zerolinecolor = '#eeeeee',
                              zerolinewidth = 2,
-                             gridcolor = 'ffff',
+                             gridcolor = '#434343',
                              hoverformat = '$,.2f',
                              tickformat = '$',
+                             color = "#FFFFFF",
                              title="Price"),
                 plot_bgcolor='#e5ecf6')
         }
@@ -183,7 +222,6 @@ plotPriceHistory <- function(price_data, domain) {
 server <- function(input, output) {
     output$productTable <- DT::renderDT(
         if (input$domain != "") { 
-            print(length(input$domain))
             datatable(
                 getProductList(input$domain), 
                 selection = 'single', # Enables selecting single rows only
