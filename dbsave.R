@@ -31,6 +31,21 @@ price_collection <- mongo(collection="prices", db="priceScrapeResults", url=conn
 #price_collection$insert(product)
 
 save_scrape <- function(scrape) {
+  # Find the most recent scrape before this one
+  most_recent <- price_collection$find(
+    query = paste0('{"request_url" : "',scrape$request_url,'"}'),
+    sort = '{ "date_scraped" : -1 }',
+    limit = 1,
+    skip=0
+  )
+  
+  scrape$price_update <- case_when(
+    most_recent$price == scrape$price ~ "FALSE",
+    most_recent$price < scrape$price ~ "UP",
+    most_recent$price > scrape$price ~ "DOWN",
+    TRUE ~ "NA"
+  )
+  
   result <- price_collection$insert(scrape)
   if (length(result$writeErrors) > 0) {
     print("scrape db write error")
