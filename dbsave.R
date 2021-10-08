@@ -40,11 +40,18 @@ save_scrape <- function(scrape) {
   )
   
   scrape$price_update <- case_when(
-    most_recent$price == scrape$price ~ "FALSE",
-    most_recent$price < scrape$price ~ "UP",
-    most_recent$price > scrape$price ~ "DOWN",
+    length(most_recent$price) == 0 ~ "NA",
+    length(most_recent$price) != 0 ~ "NOT NA",
     TRUE ~ "NA"
   )
+  if (scrape$price_update == "NOT NA") {
+    scrape$price_update <- case_when(
+      most_recent$price == scrape$price ~ "FALSE",
+      most_recent$price < scrape$price ~ "UP",
+      most_recent$price > scrape$price ~ "DOWN",
+      TRUE ~ "NA"
+    )
+  }
   
   result <- price_collection$insert(scrape)
   if (length(result$writeErrors) > 0) {
