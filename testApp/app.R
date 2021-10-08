@@ -204,6 +204,7 @@ plotPriceHistory <- function(price_data, domain) {
                              zerolinewidth = 2,
                              gridcolor = '#434343',
                              title="Date",
+                             range = c(min(prices_to_render$date_col), Sys.Date()+2),
                              color = "#FFFFFF"),
                 yaxis = list(zerolinecolor = '#eeeeee',
                              zerolinewidth = 2,
