@@ -61,15 +61,15 @@ scrape_url <- function(url) {
     print("Error reading price.  Not adding to db") 
     print(url)
   } else {
-  product <- tibble(
-    name = product_name,
-    price = product_price,
-    code = product_code,
-    request_url = url,
-    date_scraped = Sys.time()
-  )
-  print(product)
-  save_scrape(product) 
+    product <- tibble(
+      name = product_name,
+      price = product_price,
+      code = product_code,
+      request_url = url,
+      date_scraped = Sys.time()
+    )
+    print(product)
+    save_scrape(product) 
   }
 }
 
