@@ -197,8 +197,15 @@ plotPriceHistory <- function(price_data, domain) {
                 paper_bgcolor="#222222",
                 plot_bgcolor="#222222",
                 title = list(
-                    text = "Price history",
-                    xanchor = 'left',
+                    text = paste0(
+                        "Price history<br>",
+                        '<span style="font-size: 10px;">',
+                        '<a href="',
+                        price_data$url,
+                        '" target="_blank">',
+                        price_data$name,
+                        '</a></span>'),
+                    xanchor = 'center',
                     font = list(
                         size = 20,
                         color = "#FFFFFF"
@@ -269,7 +276,7 @@ server <- function(input, output, session) {
         sortedList <- getProductList(input$domain)
         # print(sortedList)
         urlToFind <- sortedList$`URL`[input$productTable_rows_selected]
-        prices <- shiny_price_collection$find(paste0('{"request_url" : "', urlToFind, '"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1}')
+        prices <- shiny_price_collection$find(paste0('{"request_url" : "', urlToFind, '"}'), '{"_id" : 0, "price": 1, "date_scraped" : 1, "name" : 1, "request_url" : 1}')
         toPlot <- plotPriceHistory(prices, input$domain)
         # print(length(toPlot))
         toPlot
