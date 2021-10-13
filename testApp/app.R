@@ -226,11 +226,14 @@ plotPriceHistory <- function(price_data, domain) {
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
     
+    getProductReactive <- reactive({
+        getProductList(input$domain)
+    })
     
     output$productTable <- DT::renderDT(
         if (input$domain != "") { 
             datatable(
-                getProductList(input$domain), 
+                getProductReactive(), 
                 selection = 'single', # Enables selecting single rows only
                 rownames= FALSE, # Hides the row numbers column
                 options = list(
@@ -284,9 +287,11 @@ server <- function(input, output, session) {
         result <- urltools::domain(input$request_url)
         
         if (is.element(result, domain_list$Domains)) {
+
             output$url_result <- renderText({ paste("New URL entered", result) })
             updateSelectInput(session, "domain", selected=result)
-            proxy %>% selectRows(5)
+            print(match(input$request_url, getProductReactive()$URL))
+            proxy %>% selectRows(match(input$request_url, getProductReactive()$URL))
         } else {
             output$url_result <- renderText({ paste("Unsupported domain:", result) })
         }
