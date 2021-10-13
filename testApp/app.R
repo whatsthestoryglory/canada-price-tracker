@@ -201,7 +201,7 @@ plotPriceHistory <- function(price_data, domain) {
                         "Price history<br>",
                         '<span style="font-size: 10px;">',
                         '<a href="',
-                        price_data$url,
+                        price_data$request_url,
                         '" target="_blank">',
                         price_data$name,
                         '</a></span>'),
