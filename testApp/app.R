@@ -234,8 +234,9 @@ server <- function(input, output, session) {
         if (input$domain != "") { 
             datatable(
                 getProductReactive(), 
-                selection = 'single', # Enables selecting single rows only
-                rownames= FALSE, # Hides the row numbers column
+                selection = list(mode = 'single',
+                                 selected = match(input$request_url, getProductReactive()$URL)),# Enables selecting single rows only
+                rownames= FALSE, # Hides the row numbers column,
                 options = list(
                     columnDefs = list(list(visible=FALSE, targets=4)), # Hides the URL column
                     scrollY = "200px",
@@ -287,12 +288,19 @@ server <- function(input, output, session) {
         result <- urltools::domain(input$request_url)
         
         if (is.element(result, domain_list$Domains)) {
-            updateSelectInput(session, "domain", selected=result)
-            if(is.na(match(input$request_url, getProductReactive()$URL))) {
+            if (result != input$domain) {
+                urlList <- getProductList(result)
+                updateSelectInput(session, "domain", selected=result)
+            } else {
+                urlList <- getProductReactive()
+            }
+            if(is.na(match(input$request_url, urlList$URL))) {
                 output$url_result <- renderText({ "URL Not currently tracked" })
+                print(input$domain)
+                print(getProductReactive())
             } else {
                 output$url_result <- renderText({ paste("New URL entered", result) })
-                proxy %>% selectRows(match(input$request_url, getProductReactive()$URL))
+                proxy %>% selectRows(match(input$request_url, urlList$URL))
             }
             
         } else {
