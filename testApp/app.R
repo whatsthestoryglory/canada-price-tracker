@@ -287,11 +287,14 @@ server <- function(input, output, session) {
         result <- urltools::domain(input$request_url)
         
         if (is.element(result, domain_list$Domains)) {
-
-            output$url_result <- renderText({ paste("New URL entered", result) })
             updateSelectInput(session, "domain", selected=result)
-            print(match(input$request_url, getProductReactive()$URL))
-            proxy %>% selectRows(match(input$request_url, getProductReactive()$URL))
+            if(is.na(match(input$request_url, getProductReactive()$URL))) {
+                output$url_result <- renderText({ "URL Not currently tracked" })
+            } else {
+                output$url_result <- renderText({ paste("New URL entered", result) })
+                proxy %>% selectRows(match(input$request_url, getProductReactive()$URL))
+            }
+            
         } else {
             output$url_result <- renderText({ paste("Unsupported domain:", result) })
         }
