@@ -225,25 +225,6 @@ plotPriceHistory <- function(price_data, domain) {
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session) {
-    # Clear the request_url field when a new domain is selected
-    observeEvent(input$domain, {
-        if (isTRUE(input$domain != urltools::domain(input$request_url))) {
-            updateTextInput(session, "request_url",value="")
-            output$url_result <- renderText({ paste("New domain selected") })
-        }
-    })
-    
-    # Take action when the geturl button is pressed
-    observeEvent(input$geturl, {
-        result <- urltools::domain(input$request_url)
-        
-        if (is.element(result, domain_list$Domains)) {
-            output$url_result <- renderText({ paste("New URL entered", result) })
-            updateSelectInput(session, "domain", selected=result)
-        } else {
-            output$url_result <- renderText({ paste("Unsupported domain:", result) })
-        }
-    })
     
     
     output$productTable <- DT::renderDT(
@@ -277,8 +258,9 @@ server <- function(input, output, session) {
         } else { data.table(variable1 = integer(),
                            variable2 = character(),
                            variable3 = numeric()) } )
-
-
+    
+    proxy = dataTableProxy('productTable')
+    
     output$selectedProducts <- renderPlotly({
         sortedList <- getProductList(input$domain)
         # print(sortedList)
@@ -287,6 +269,27 @@ server <- function(input, output, session) {
         toPlot <- plotPriceHistory(prices, input$domain)
         # print(length(toPlot))
         toPlot
+    })
+    
+    # Clear the request_url field when a new domain is selected
+    observeEvent(input$domain, {
+        if (isTRUE(input$domain != urltools::domain(input$request_url))) {
+            updateTextInput(session, "request_url",value="")
+            output$url_result <- renderText({ paste("New domain selected") })
+        }
+    })
+    
+    # Take action when the geturl button is pressed
+    observeEvent(input$geturl, {
+        result <- urltools::domain(input$request_url)
+        
+        if (is.element(result, domain_list$Domains)) {
+            output$url_result <- renderText({ paste("New URL entered", result) })
+            updateSelectInput(session, "domain", selected=result)
+            proxy %>% selectRows(5)
+        } else {
+            output$url_result <- renderText({ paste("Unsupported domain:", result) })
+        }
     })
     
     # output$url_result <- renderText({ input$request_url })
