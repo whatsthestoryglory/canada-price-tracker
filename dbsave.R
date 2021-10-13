@@ -46,7 +46,7 @@ save_scrape <- function(scrape) {
   )
   if (scrape$price_update == "NOT NA") {
     scrape$price_update <- case_when(
-      most_recent$price == scrape$price ~ "FALSE",
+      near(scrape$price, most_recent$price) ~ "FALSE",
       most_recent$price < scrape$price ~ "UP",
       most_recent$price > scrape$price ~ "DOWN",
       TRUE ~ "NA"
