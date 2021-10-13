@@ -15,6 +15,7 @@ library(DT)
 library(tidyverse)
 library(plotly)
 library(lubridate)
+library(urltools)
 thematic::thematic_shiny()
 # readRenviron(".Renviron")
 mongo_string <- (Sys.getenv("MONGO_STRING"))
@@ -51,7 +52,10 @@ ui <- fluidPage(
                wellPanel(
                    selectInput("domain",
                                "Website:",
-                               domain_list)
+                               domain_list),
+                   textInput("request_url", "Product URL", value = "", width = NULL, placeholder = "https://www.example.com/product123.html"),
+                   actionButton("geturl", "GET"),
+                   verbatimTextOutput("url_result")
                )
               ),
         
@@ -220,7 +224,28 @@ plotPriceHistory <- function(price_data, domain) {
 
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
+    # Clear the request_url field when a new domain is selected
+    observeEvent(input$domain, {
+        if (isTRUE(input$domain != urltools::domain(input$request_url))) {
+            updateTextInput(session, "request_url",value="")
+            output$url_result <- renderText({ paste("New domain selected") })
+        }
+    })
+    
+    # Take action when the geturl button is pressed
+    observeEvent(input$geturl, {
+        result <- urltools::domain(input$request_url)
+        
+        if (is.element(result, domain_list$Domains)) {
+            output$url_result <- renderText({ paste("New URL entered", result) })
+            updateSelectInput(session, "domain", selected=result)
+        } else {
+            output$url_result <- renderText({ paste("Unsupported domain:", result) })
+        }
+    })
+    
+    
     output$productTable <- DT::renderDT(
         if (input$domain != "") { 
             datatable(
@@ -263,6 +288,8 @@ server <- function(input, output) {
         # print(length(toPlot))
         toPlot
     })
+    
+    # output$url_result <- renderText({ input$request_url })
     #output$selectedProducts <- getPriceHistory(input$productTable_rows_selected)
 }
 
