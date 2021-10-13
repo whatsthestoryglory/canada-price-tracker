@@ -26,6 +26,9 @@ scrape_url <- function(url) {
   product_price <- product_html %>% 
     html_nodes(xpath='//*[contains(concat( " ", @class, " " ), concat( " ", "item-purchase-container__price-and-format", " " ))]') %>% 
     html_text() %>%
+    str_split(pattern="save")
+  
+  product_price <- product_price[[1]][1] %>%  
     str_extract_all(pattern="([0123456789.]+,*[0123456789.]*)") %>% 
     unlist() %>% 
     gsub(pattern=",", replacement="") %>%
